@@ -23,23 +23,22 @@ namespace GildedTros.App
 
         private DegradationProcessor GetDegradationProcessor(string itemName)
         {
-            if (itemName == "Good Wine")
+            if (itemName == Constants.GoodWine)
             {
                 return new DegradationProcessor(new GoodWineDegradationStrategy());
             }
 
-            if (itemName == "B-DAWG Keychain")
+            if (itemName == Constants.BDawgKeychain)
             {
                 return new DegradationProcessor(new LegendaryDegradationStrategy());
             }
 
-            if (itemName.StartsWith("Backstage passes"))
+            if (itemName.StartsWith(Constants.BackStagePasses))
             {
                 return new DegradationProcessor(new BackStagePassDegradationStrategy());
             }
 
-            string[] smellyItemNames = { "Duplicate Code", "Long Methods", "Ugly Variable Names" };
-            if (smellyItemNames.Any(smellyName => smellyName == itemName))
+            if (Constants.smellyItemNames .Any(smellyName => smellyName == itemName))
             {
                 return new DegradationProcessor(new SmellyDegradationStrategy());
             }
