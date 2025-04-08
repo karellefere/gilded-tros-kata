@@ -1,5 +1,6 @@
 ﻿using GildedTros.App.DegradationStrategies;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GildedTros.App
 {
@@ -35,6 +36,12 @@ namespace GildedTros.App
             if (itemName.StartsWith("Backstage passes"))
             {
                 return new DegradationProcessor(new BackStagePassDegradationStrategy());
+            }
+
+            string[] smellyItemNames = { "Duplicate Code", "Long Methods", "Ugly Variable Names" };
+            if (smellyItemNames.Any(smellyName => smellyName == itemName))
+            {
+                return new DegradationProcessor(new SmellyDegradationStrategy());
             }
 
             return new DegradationProcessor(new NormalDegradationStrategy());
