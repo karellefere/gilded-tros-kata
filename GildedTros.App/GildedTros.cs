@@ -1,4 +1,4 @@
-﻿using System;
+﻿using GildedTros.App.DegradationStrategies;
 using System.Collections.Generic;
 
 namespace GildedTros.App
@@ -13,144 +13,31 @@ namespace GildedTros.App
 
         public void UpdateQuality()
         {
-            for (var i = 0; i < Items.Count; i++)
+            foreach(var item in Items)
             {
-                var item = Items[i];
-
-                if(item.Name == "Good Wine")
-                {
-                    UpdateQualityGoodWine(item);
-                    continue;
-                }
-
-                if(item.Name == "B-DAWG Keychain")
-                {
-                    UpdateQualityLegendary(item);
-                    continue;
-                }
-
-                if(item.Name.StartsWith("Backstage passes"))
-                {
-                    UpdateQualityBackStagePass(item);
-                    continue;
-                }
-
-                UpdateQualityNormal(item);
-            }
-        }
-        
-        private void QualityCheck(Item item)
-        {
-            item.Quality = Math.Max(item.Quality, 0);
-            item.Quality = Math.Min(item.Quality, 50);
-        }
-
-        private void UpdateQualityNormal(Item item)
-        {
-            if(item == null)
-            {
-                return;
-            }
-
-            item.SellIn -= 1;
-            
-            if(item.SellIn < 0){
-                item.Quality -= 2;
-            }
-            else
-            {
-                item.Quality -= 1;
-            }
-
-            QualityCheck(item);
-        }
-
-        private void UpdateQualityGoodWine(Item item)
-        {
-            if(item == null)
-            {
-                return;
-            }
-
-            item.SellIn -= 1;
-
-            if(item.SellIn < 0)
-            {
-                item.Quality += 2;
-            }
-            else
-            {
-                item.Quality += 1;
-            }
-
-            QualityCheck(item);
-        }
-
-        private void UpdateQualityLegendary(Item item)
-        {
-            if(item == null)
-            {
-                return;
-            }
-
-            if(item.Quality != 80)
-            {
-                item.Quality = 80;
+                var degradationProcessor = GetDegradationProcessor(item.Name);
+                degradationProcessor.ProcessDegradation(item);
             }
         }
 
-        private void UpdateQualityBackStagePass(Item item)
+        private DegradationProcessor GetDegradationProcessor(string itemName)
         {
-            if (item == null)
+            if (itemName == "Good Wine")
             {
-                return;
+                return new DegradationProcessor(new GoodWineDegradationStrategy());
             }
 
-            int oldSellIn = item.SellIn;
-
-            item.SellIn -= 1;
-
-            if (oldSellIn <= 0)
+            if (itemName == "B-DAWG Keychain")
             {
-                item.Quality = 0;
-
-                QualityCheck(item);
-                return;
+                return new DegradationProcessor(new LegendaryDegradationStrategy());
             }
 
-            if(oldSellIn > 10)
+            if (itemName.StartsWith("Backstage passes"))
             {
-                item.Quality += 1;
-
-                QualityCheck(item);
-                return;
+                return new DegradationProcessor(new BackStagePassDegradationStrategy());
             }
 
-            if(oldSellIn > 5)
-            {
-                item.Quality += 2;
-
-                QualityCheck(item);
-                return;
-            }
-
-            item.Quality += 3;
-
-            QualityCheck(item);
-        }
-
-        private void UpdateQualitySmellyItem(Item item)
-        {
-            if (item == null)
-            {
-                return;
-            }
-
-            item.SellIn -= 1;
-
-            item.Quality -= 2;
-
-            QualityCheck(item);
+            return new DegradationProcessor(new NormalDegradationStrategy());
         }
     }
 }
