@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace GildedTros.App
 {
@@ -14,80 +15,142 @@ namespace GildedTros.App
         {
             for (var i = 0; i < Items.Count; i++)
             {
-                if (Items[i].Name != "Good Wine" 
-                    && Items[i].Name != "Backstage passes for Re:factor"
-                    && Items[i].Name != "Backstage passes for HAXX")
-                {
-                    if (Items[i].Quality > 0)
-                    {
-                        if (Items[i].Name != "B-DAWG Keychain")
-                        {
-                            Items[i].Quality = Items[i].Quality - 1;
-                        }
-                    }
-                }
-                else
-                {
-                    if (Items[i].Quality < 50)
-                    {
-                        Items[i].Quality = Items[i].Quality + 1;
+                var item = Items[i];
 
-                        if (Items[i].Name == "Backstage passes for Re:factor"
-                        || Items[i].Name == "Backstage passes for HAXX")
-                        {
-                            if (Items[i].SellIn < 11)
-                            {
-                                if (Items[i].Quality < 50)
-                                {
-                                    Items[i].Quality = Items[i].Quality + 1;
-                                }
-                            }
-
-                            if (Items[i].SellIn < 6)
-                            {
-                                if (Items[i].Quality < 50)
-                                {
-                                    Items[i].Quality = Items[i].Quality + 1;
-                                }
-                            }
-                        }
-                    }
+                if(item.Name == "Good Wine")
+                {
+                    UpdateQualityGoodWine(item);
+                    continue;
                 }
 
-                if (Items[i].Name != "B-DAWG Keychain")
+                if(item.Name == "B-DAWG Keychain")
                 {
-                    Items[i].SellIn = Items[i].SellIn - 1;
+                    UpdateQualityLegendary(item);
+                    continue;
                 }
 
-                if (Items[i].SellIn < 0)
+                if(item.Name.StartsWith("Backstage passes"))
                 {
-                    if (Items[i].Name != "Good Wine")
-                    {
-                        if (Items[i].Name != "Backstage passes for Re:factor"
-                            && Items[i].Name != "Backstage passes for HAXX")
-                        {
-                            if (Items[i].Quality > 0)
-                            {
-                                if (Items[i].Name != "B-DAWG Keychain")
-                                {
-                                    Items[i].Quality = Items[i].Quality - 1;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Items[i].Quality = Items[i].Quality - Items[i].Quality;
-                        }
-                    }
-                    else
-                    {
-                        if (Items[i].Quality < 50)
-                        {
-                            Items[i].Quality = Items[i].Quality + 1;
-                        }
-                    }
+                    UpdateQualityBackStagePass(item);
+                    continue;
                 }
+
+                UpdateQualityNormal(item);
             }
+        }
+        
+        private void QualityCheck(Item item)
+        {
+            item.Quality = Math.Max(item.Quality, 0);
+            item.Quality = Math.Min(item.Quality, 50);
+        }
+
+        private void UpdateQualityNormal(Item item)
+        {
+            if(item == null)
+            {
+                return;
+            }
+
+            item.SellIn -= 1;
+            
+            if(item.SellIn < 0){
+                item.Quality -= 2;
+            }
+            else
+            {
+                item.Quality -= 1;
+            }
+
+            QualityCheck(item);
+        }
+
+        private void UpdateQualityGoodWine(Item item)
+        {
+            if(item == null)
+            {
+                return;
+            }
+
+            item.SellIn -= 1;
+
+            if(item.SellIn < 0)
+            {
+                item.Quality += 2;
+            }
+            else
+            {
+                item.Quality += 1;
+            }
+
+            QualityCheck(item);
+        }
+
+        private void UpdateQualityLegendary(Item item)
+        {
+            if(item == null)
+            {
+                return;
+            }
+
+            if(item.Quality != 80)
+            {
+                item.Quality = 80;
+            }
+        }
+
+        private void UpdateQualityBackStagePass(Item item)
+        {
+            if (item == null)
+            {
+                return;
+            }
+
+            int oldSellIn = item.SellIn;
+
+            item.SellIn -= 1;
+
+            if (oldSellIn <= 0)
+            {
+                item.Quality = 0;
+
+                QualityCheck(item);
+                return;
+            }
+
+            if(oldSellIn > 10)
+            {
+                item.Quality += 1;
+
+                QualityCheck(item);
+                return;
+            }
+
+            if(oldSellIn > 5)
+            {
+                item.Quality += 2;
+
+                QualityCheck(item);
+                return;
+            }
+
+            item.Quality += 3;
+
+            QualityCheck(item);
+        }
+
+        private void UpdateQualitySmellyItem(Item item)
+        {
+            if (item == null)
+            {
+                return;
+            }
+
+            item.SellIn -= 1;
+
+            item.Quality -= 2;
+
+            QualityCheck(item);
         }
     }
 }
