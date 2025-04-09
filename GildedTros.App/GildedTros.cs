@@ -38,7 +38,7 @@ namespace GildedTros.App
                 return new DegradationProcessor(new BackStagePassDegradationStrategy());
             }
 
-            if (Constants.smellyItemNames .Any(smellyName => smellyName == itemName))
+            if (Constants.smellyItemNames.Any(smellyName => smellyName == itemName))
             {
                 return new DegradationProcessor(new SmellyDegradationStrategy());
             }
